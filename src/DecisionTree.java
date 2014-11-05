@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.xml.crypto.Data;
+
 
 public class DecisionTree {
 
@@ -29,6 +31,15 @@ public class DecisionTree {
 		else {
 			double minGain = 0.0;
 			int attrIndex = -1;
+			InfoGain infoGain = new InfoGain(trainPost,attributeList,postToThemeMap,continuous);
+			for(int i = 0;i<attributeList.size();i++){
+				double tempGain = infoGain.giniIndex(i);
+				if(minGain>tempGain){
+					minGain = tempGain;
+					attrIndex = i;
+				}
+			}
+			node.setAttributeValue(attributeList.get(attrIndex));
 			
 		}
 		

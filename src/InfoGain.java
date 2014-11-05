@@ -13,6 +13,7 @@ public class InfoGain {
 	ArrayList<Integer> attributeList;
 	HashMap<Integer, Integer> postToThemeMap;
 	ArrayList<Integer> continuousArrayList;
+	HashMap<Integer, Double> splitValMap;
 	public InfoGain(){
 		
 	}
@@ -27,6 +28,7 @@ public class InfoGain {
 		this.attributeList = (ArrayList<Integer>) attributeList.clone();
 		this.postToThemeMap = (HashMap<Integer, Integer>) postToThemeMap.clone();
 		this.continuousArrayList = (ArrayList<Integer>) continuous.clone();
+		splitValMap = new HashMap<Integer, Double>();
 	}
 	
 	public int isPure(HashMap<Integer, Integer> map){
@@ -62,18 +64,17 @@ public class InfoGain {
 			}
 			
 			double minGini=-1;
-			double splitVal;
+			double splitVal=0;
 			for(int x = 0;x<(tempAttriValue.length-1);x++){
 				double mid = (tempAttriValue[x]+tempAttriValue[x+1])/2.0;
 				HashMap<Integer, Integer> lessSet = new HashMap<Integer,Integer>();
 				HashMap<Integer, Integer> biggerSet = new HashMap<Integer,Integer>();
 				for(int y = 0;y<data.length;y++){
+					int theme = postToThemeMap.get(y);
 					if(data[y][i]>mid){
-						int theme = postToThemeMap.get(y);
 						biggerSet.put(y, theme);
 					}
 					else{
-						int theme = postToThemeMap.get(y);
 						lessSet.put(y, theme);
 					}
 				}
@@ -94,12 +95,59 @@ public class InfoGain {
 				}
 			}
 			gini = minGini;
+			splitValMap.put(i, splitVal);
 		}
-		else{			//对于离散属性，
+		else{			//对于离散属性，把所有属性值都作为一次分裂尝试，找到最佳的分裂方式
+			
+			HashSet<Double> tempAttriValue = new HashSet<Double>();
+			for(int x = 0;x<data.length;x++){
+				tempAttriValue.add(data[x][i]);
+			}
+			Iterator<Double> iterator = tempAttriValue.iterator();
+			double miniGini = -1;
+			double splitVal=0;
+			while(iterator.hasNext()){
+				double attriVal = iterator.next();
+				
+				HashMap<Integer, Integer> isThisAttributeValHashMap = new HashMap<Integer, Integer>();
+				HashMap<Integer, Integer> notThisAttributeValHashMap = new HashMap<Integer, Integer>();
+				
+				for(int x = 0;x<data.length;x++){
+					int theme = postToThemeMap.get(x);
+					
+					if(data[x][i]==attriVal){
+						isThisAttributeValHashMap.put(x, theme);
+					}
+					else {
+						notThisAttributeValHashMap.put(x, theme);
+					}
+				}
+				
+				double isSize = isThisAttributeValHashMap.size();
+				double notSize = notThisAttributeValHashMap.size();
+				
+				double giniGain = (isSize/(isSize+notSize))*getGini(isThisAttributeValHashMap)+
+						(notSize/(isSize+notSize))*getGini(notThisAttributeValHashMap);
+				
+				if(miniGini ==-1){
+					miniGini = giniGain;
+					splitVal = attriVal;
+				}
+				else {
+					if(miniGini>giniGain){
+						miniGini = giniGain;
+						splitVal = attriVal;
+					}
+				}
+			}
+			gini = miniGini;
+			splitValMap.put(i, splitVal);
 			
 		}
-		return 0;
+		return gini;
 	}
+	
+	
 	
 	public double getGini(HashMap<Integer, Integer> map){
 		double size = map.size();

@@ -10,6 +10,7 @@ public class TreeNode {
 	ArrayList<TreeNode> childTreeNodes;
 	HashSet<Integer> nodeDataSet;
 	int nodeId;
+	double splitVal;
 	
 	public TreeNode(String nodeName){
 		this.nodeName = nodeName;
@@ -61,5 +62,12 @@ public class TreeNode {
 		return nodeId;
 	}
 	
+	public void setSplitVal(double splitVal){
+		this.splitVal = splitVal;
+	}
+	
+	public double getSplitVal(){
+		return splitVal;
+	}
 	
 }
