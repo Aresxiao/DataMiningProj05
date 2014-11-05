@@ -40,9 +40,10 @@ public class DecisionTree {
 				}
 			}
 			node.setAttributeValue(attributeList.get(attrIndex));
+			node.setSplitVal(infoGain.getSplit(attrIndex));
 			
+			double[][] resultData;
 		}
-		
 		return node;
 	}
 }

@@ -142,11 +142,9 @@ public class InfoGain {
 			}
 			gini = miniGini;
 			splitValMap.put(i, splitVal);
-			
 		}
 		return gini;
 	}
-	
 	
 	
 	public double getGini(HashMap<Integer, Integer> map){
@@ -177,4 +175,16 @@ public class InfoGain {
 		return sum;
 	}
 	
+	public double getSplit(int i){
+		return splitValMap.get(i);
+	}
+	
+	public double[][] getLeftData(double[][] data){
+		double[][] ret = new double[data.length][data[0].length];
+		return null;
+	}
+	
+	public double[][] getRightData(double[][] data){
+		
+	}
 }
