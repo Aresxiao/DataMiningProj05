@@ -4,44 +4,34 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+
 
 
 public class InfoGain {
 	
 	double[][] data;
 	ArrayList<Integer> attributeList;
-	HashMap<Integer, Integer> postToThemeMap;
 	ArrayList<Integer> continuousArrayList;
 	HashMap<Integer, Double> splitValMap;
+	
+	double[][] leftData;
+	double[][] rightData;
 	public InfoGain(){
 		
 	}
 	
-	public InfoGain(double[][] data,ArrayList<Integer> attributeList,
-			HashMap<Integer, Integer> postToThemeMap,ArrayList<Integer> continuous){
+	public InfoGain(double[][] data,ArrayList<Integer> attributeList,ArrayList<Integer> continuous){
 		this.data = new double[data.length][data[0].length];
 		for(int i = 0;i<this.data.length;i++){
 			for(int j = 0;j<this.data[0].length;j++)
 				this.data[i][j] = data[i][j];
 		}
 		this.attributeList = (ArrayList<Integer>) attributeList.clone();
-		this.postToThemeMap = (HashMap<Integer, Integer>) postToThemeMap.clone();
+		
 		this.continuousArrayList = (ArrayList<Integer>) continuous.clone();
 		splitValMap = new HashMap<Integer, Double>();
 	}
 	
-	public int isPure(HashMap<Integer, Integer> map){
-		Set<Integer> set = new HashSet<Integer>();
-		Iterator<Integer> iterator = map.values().iterator();
-		while(iterator.hasNext()){
-			set.add(iterator.next());
-		}
-		if(set.size()>1) return -1;
-		
-		iterator = set.iterator();
-		return iterator.next();
-	}
 	
 	public double giniIndex(int i){
 		double gini = 0;
@@ -63,14 +53,15 @@ public class InfoGain {
 				}
 			}
 			
-			double minGini=-1;
+			double minGini=1.0;
 			double splitVal=0;
 			for(int x = 0;x<(tempAttriValue.length-1);x++){
 				double mid = (tempAttriValue[x]+tempAttriValue[x+1])/2.0;
-				HashMap<Integer, Integer> lessSet = new HashMap<Integer,Integer>();
-				HashMap<Integer, Integer> biggerSet = new HashMap<Integer,Integer>();
+				HashMap<Integer, Double> lessSet = new HashMap<Integer,Double>();
+				HashMap<Integer, Double> biggerSet = new HashMap<Integer,Double>();
 				for(int y = 0;y<data.length;y++){
-					int theme = postToThemeMap.get(y);
+					int lastIndex = data[0].length-1;
+					double theme = data[y][lastIndex];
 					if(data[y][i]>mid){
 						biggerSet.put(y, theme);
 					}
@@ -83,15 +74,9 @@ public class InfoGain {
 				
 				double giniGain = (biggerSetSize/(biggerSetSize+lessSetSize))*getGini(biggerSet)+
 						(lessSetSize/(lessSetSize+biggerSetSize))*getGini(lessSet);
-				if(minGini == -1){
-					minGini=giniGain;
+				if(minGini>giniGain){
+					minGini = giniGain;
 					splitVal = mid;
-				}
-				else {
-					if(minGini>giniGain){
-						minGini = giniGain;
-						splitVal = mid;
-					}
 				}
 			}
 			gini = minGini;
@@ -104,16 +89,17 @@ public class InfoGain {
 				tempAttriValue.add(data[x][i]);
 			}
 			Iterator<Double> iterator = tempAttriValue.iterator();
-			double miniGini = -1;
+			double miniGini = 1.0;
 			double splitVal=0;
 			while(iterator.hasNext()){
 				double attriVal = iterator.next();
 				
-				HashMap<Integer, Integer> isThisAttributeValHashMap = new HashMap<Integer, Integer>();
-				HashMap<Integer, Integer> notThisAttributeValHashMap = new HashMap<Integer, Integer>();
+				HashMap<Integer, Double> isThisAttributeValHashMap = new HashMap<Integer, Double>();
+				HashMap<Integer, Double> notThisAttributeValHashMap = new HashMap<Integer, Double>();
 				
+				int lastIndex = data[0].length - 1;
 				for(int x = 0;x<data.length;x++){
-					int theme = postToThemeMap.get(x);
+					double theme = data[x][lastIndex];
 					
 					if(data[x][i]==attriVal){
 						isThisAttributeValHashMap.put(x, theme);
@@ -129,16 +115,11 @@ public class InfoGain {
 				double giniGain = (isSize/(isSize+notSize))*getGini(isThisAttributeValHashMap)+
 						(notSize/(isSize+notSize))*getGini(notThisAttributeValHashMap);
 				
-				if(miniGini ==-1){
+				if(miniGini > giniGain){
 					miniGini = giniGain;
 					splitVal = attriVal;
 				}
-				else {
-					if(miniGini>giniGain){
-						miniGini = giniGain;
-						splitVal = attriVal;
-					}
-				}
+				
 			}
 			gini = miniGini;
 			splitValMap.put(i, splitVal);
@@ -147,13 +128,13 @@ public class InfoGain {
 	}
 	
 	
-	public double getGini(HashMap<Integer, Integer> map){
+	public double getGini(HashMap<Integer, Double> map){
 		double size = map.size();
 		HashMap<Integer, Double> themeNumMap = new HashMap<Integer, Double>();
 		Iterator iterator = map.entrySet().iterator();
 		while(iterator.hasNext()){
 			Map.Entry<Integer, Integer> entry = (Entry<Integer, Integer>) iterator.next();
-			int post = entry.getKey();
+			
 			int val = entry.getValue();
 			if(themeNumMap.containsKey(val)){
 				double d = themeNumMap.get(val);
@@ -179,12 +160,76 @@ public class InfoGain {
 		return splitValMap.get(i);
 	}
 	
-	public double[][] getLeftData(double[][] data){
-		double[][] ret = new double[data.length][data[0].length];
-		return null;
+	public void splitData(int attriIndex){
+		
+		ArrayList<Integer> leftList = new ArrayList<Integer>();
+		ArrayList<Integer> rightList = new ArrayList<Integer>();
+		int len = data[0].length;
+		double splitVal = splitValMap.get(attriIndex);
+		if(continuousArrayList.get(attriIndex)==0){
+			for(int i = 0;i<data.length;i++){
+				if(data[i][attriIndex]<splitVal){
+					leftList.add(i);
+				}
+				else {
+					rightList.add(i);
+				}
+			}
+		}
+		else{
+			for(int i = 0;i<data.length;i++){
+				if(data[i][attriIndex]==splitVal){
+					leftList.add(i);
+				}
+				else {
+					rightList.add(i);
+				}
+			}
+		}
+		int leftSize = leftList.size();
+		int rightSize = rightList.size();
+		leftData = new double[leftSize][len];
+		rightData = new double[rightSize][len];
+		
+		for(int i = 0;i<leftSize;i++){
+			int row = leftList.get(i);
+			for(int j = 0;j<len;j++){
+				leftData[i][j] = data[row][j];
+			}
+		}
+		for(int i = 0;i<rightSize;i++){
+			int row = rightList.get(i);
+			for(int j = 0;j<len;j++){
+				rightData[i][j] = data[row][j];
+			}
+		}
 	}
 	
-	public double[][] getRightData(double[][] data){
+	public double[][] getRightData(){
 		
+		return rightData;
+	}
+	public double[][] getLeftData(){
+		
+		return leftData;
+	}
+	
+	public static double isPure(ArrayList<Double> list) {
+		HashSet<Double> set = new HashSet<Double>();
+		for(double d:list){
+			set.add(d);
+		}
+		if(set.size()>1) return -1;
+		Iterator<Double> iterator = set.iterator();
+		return iterator.next();
+	}
+	
+	public static ArrayList<Double> getTarget(double[][] trainData){
+		ArrayList<Double> list = new ArrayList<Double>();
+		int lastIndex = trainData[0].length-1;
+		for(int i = 0;i < trainData.length ;i++){
+			list.add(trainData[i][lastIndex]);
+		}
+		return list;
 	}
 }

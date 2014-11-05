@@ -6,11 +6,13 @@ public class TreeNode {
 	int category;
 	
 	String nodeName;
-	int attributeValue;
+	double attributeValue;
+	double targetValue;
 	ArrayList<TreeNode> childTreeNodes;
 	HashSet<Integer> nodeDataSet;
 	int nodeId;
 	double splitVal;
+	int continuous;
 	
 	public TreeNode(String nodeName){
 		this.nodeName = nodeName;
@@ -46,11 +48,11 @@ public class TreeNode {
 		this.childTreeNodes = childTreeNode;
 	}
 	
-	public void setAttributeValue(int value){
+	public void setAttributeValue(double value){
 		this.attributeValue = value;
 	}
 	
-	public int getAttributeValue(){
+	public double getAttributeValue(){
 		return attributeValue;
 	}
 	
@@ -70,4 +72,19 @@ public class TreeNode {
 		return splitVal;
 	}
 	
+	public void setTartgetValue(double targetValue){
+		this.targetValue = targetValue;
+	}
+	
+	public double getTargetValue(){
+		return targetValue;
+	}
+	
+	public void setContinuous(int flag){
+		continuous = flag;
+	}
+	
+	public int getContinuous(){
+		return continuous;
+	}
 }
