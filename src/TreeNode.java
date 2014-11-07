@@ -6,7 +6,7 @@ public class TreeNode {
 	int category;
 	
 	String nodeName;
-	double attributeValue;
+	int attributeValue;
 	double targetValue;
 	ArrayList<TreeNode> childTreeNodes;
 	HashSet<Integer> nodeDataSet;
@@ -48,11 +48,11 @@ public class TreeNode {
 		this.childTreeNodes = childTreeNode;
 	}
 	
-	public void setAttributeValue(double value){
+	public void setAttributeValue(int value){
 		this.attributeValue = value;
 	}
 	
-	public double getAttributeValue(){
+	public int getAttributeValue(){
 		return attributeValue;
 	}
 	

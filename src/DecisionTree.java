@@ -1,12 +1,18 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class DecisionTree {
 
 	int totalPost;
 	ArrayList<Integer> attribute;
-	public DecisionTree(int totalPost){
+	TreeNode rootNode;
+	ArrayList<Integer> attributeContinuous;
+	public DecisionTree(int totalPost,ArrayList<Integer> continuous){
 		this.totalPost = totalPost;
 		attribute = new ArrayList<Integer>();
+		attributeContinuous = (ArrayList<Integer>) continuous.clone();
+		
 	}
 	
 	public TreeNode createDT(double[][] trainData,ArrayList<Integer> dataAttributeList,ArrayList<Integer> continuous){
@@ -16,11 +22,66 @@ public class DecisionTree {
 		
 		if(pureVal!=-1){
 			node.setNodeName("leafNode");
+			node.setNodeId(0);
 			node.setTartgetValue(pureVal);
 			return node;
 		}
 		if(dataAttributeList.size()==0){
-			node.setTartgetValue(pureVal);
+			HashMap<Double, Double> themeNumMap = new HashMap<Double, Double>();
+			int lastIndex = trainData[0].length - 1;
+			for(int i = 0;i < trainData.length; i++){
+				if(themeNumMap.containsKey(trainData[i][lastIndex])){
+					double d = themeNumMap.get(trainData[i][lastIndex]);
+					themeNumMap.put(trainData[i][lastIndex], d+1.0);
+				}
+				else {
+					themeNumMap.put(trainData[i][lastIndex], 1.0);
+				}
+			}
+			double maxKey = 0;
+			double maxVal = -10;
+			Iterator<Double> iterator = themeNumMap.keySet().iterator();
+			while(iterator.hasNext()){
+				double key = iterator.next();
+				double val = themeNumMap.get(key);
+				if(val>maxVal){
+					maxVal = val;
+					maxKey = key;
+				}
+			}
+			node.setNodeName("leafNode");
+			node.setNodeId(0);
+			node.setTartgetValue(maxKey);
+			return node;
+		}
+		if(trainData.length < 6){
+			HashMap<Double, Double> themeNumMap = new HashMap<Double,Double>();
+			int lastIndex = trainData[0].length-1;
+			for(int i = 0;i < trainData.length;i++){
+				if(themeNumMap.containsKey(trainData[i][lastIndex])){
+					double d = themeNumMap.get(trainData[i][lastIndex]);
+					themeNumMap.put(trainData[i][lastIndex], d+1);
+				}
+				else {
+					themeNumMap.put(trainData[i][lastIndex], 1.0);
+				}
+			}
+			double maxKey = 0;
+			double maxVal = -10;
+			Iterator<Double> iterator = themeNumMap.keySet().iterator();
+			while(iterator.hasNext()){
+				double key = iterator.next();
+				double val = themeNumMap.get(key);
+				
+				if(val>maxVal){
+					maxVal = val;
+					maxKey = key;
+				}
+				
+			}
+			node.setNodeName("leafNode");
+			node.setNodeId(0);
+			node.setTartgetValue(maxKey);
 			return node;
 		}
 		else{
@@ -52,8 +113,46 @@ public class DecisionTree {
 			TreeNode rightNode = createDT(rightData, rightAttributeList, continuous);
 			node.getChildTreeNodes().add(leftNode);
 			node.getChildTreeNodes().add(rightNode);
+			node.setNodeId(1);
 		}
 		return node;
 	}
 	
+	public void trainDT(double[][] trainData,ArrayList<Integer> dataAttributeList,ArrayList<Integer> continuous){
+		rootNode = createDT(trainData, dataAttributeList, continuous);
+	}
+	
+	public double classifyByDT(double[] testData,TreeNode node){
+		
+		if(node.getId()==0){
+			return node.getTargetValue();
+		}
+		else{
+			int attrIndex = node.getAttributeValue();
+			double splitVal = node.getSplitVal();
+			
+			if(attributeContinuous.get(attrIndex)==0){
+				if(testData[attrIndex]<splitVal){
+					node = node.getChildTreeNodes().get(0);
+					
+				}
+				else {
+					node = node.getChildTreeNodes().get(1);
+				}
+				return classifyByDT(testData, node);
+			}
+			else {
+				if(testData[attrIndex] == splitVal){
+					node = node.getChildTreeNodes().get(0);
+				}
+				else {
+					node = node.getChildTreeNodes().get(1);
+				}
+				return classifyByDT(testData, node);
+			}
+		}
+	}
+	public TreeNode getRootNode(){
+		return rootNode;
+	}
 }

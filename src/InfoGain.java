@@ -133,9 +133,9 @@ public class InfoGain {
 		HashMap<Integer, Double> themeNumMap = new HashMap<Integer, Double>();
 		Iterator iterator = map.entrySet().iterator();
 		while(iterator.hasNext()){
-			Map.Entry<Integer, Integer> entry = (Entry<Integer, Integer>) iterator.next();
+			Map.Entry<Integer, Double> entry = (Entry<Integer, Double>) iterator.next();
 			
-			int val = entry.getValue();
+			int val = entry.getKey();
 			if(themeNumMap.containsKey(val)){
 				double d = themeNumMap.get(val);
 				themeNumMap.put(val, d+1.0);

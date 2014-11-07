@@ -161,16 +161,86 @@ public static void main(String[] args) throws IOException{
 		}
 		
 		int remainWordCount = wordMapIndex - deleteWord.size();		//这是删除掉一部分值
-		double[][] trainPost = new double[countPost][remainWordCount];
+		ArrayList<Integer> continuousList = new ArrayList<Integer>();
+		ArrayList<Integer> dataAttributeIndex = new ArrayList<Integer>();
+		double[][] remainPost = new double[countPost][remainWordCount+1];
 		for(int i = 0;i<countPost;i++){
 			int k = 0;
 			for(int j = 0;j<wordMapIndex;j++){
 				if(tfList[j]>=10){
-					trainPost[i][k] = tfidfMatrix[i][j];
+					remainPost[i][k] = tfidfMatrix[i][j];
+					dataAttributeIndex.add(k);
 					k++;
+					continuousList.add(0);
 				}
 			}
 		}
+		
+		
+		
+		for(int i = 0;i < countPost;i++){
+			int theme = postToThemeMap.get(i);
+			remainPost[i][remainWordCount] = theme;
+		}
+		
+		for(int k = 0;k < 10;k++){
+			HashMap<Integer, Integer> testPostToThemeMap = new HashMap<>();
+			ArrayList<Integer> trainPostRowArrayList = new ArrayList<>();
+			
+			for(int i = 0;i < countPost;i++){
+				if(i%10==k){
+					int theme = postToThemeMap.get(i);
+					testPostToThemeMap.put(i, theme);
+				}
+				else {
+					trainPostRowArrayList.add(i);
+				}
+			}
+			int testSize = testPostToThemeMap.size();
+			int trainSize = trainPostRowArrayList.size();
+			
+			double[][] testData = new double[testSize][remainWordCount+1];
+			double[][] trainData = new double[trainSize][remainWordCount+1];
+			
+			Iterator<Integer> testMapIterator = testPostToThemeMap.keySet().iterator();
+			int testRowCount = 0;
+			while (testMapIterator.hasNext()) {
+				int row = (Integer) testMapIterator.next();
+				for(int j = 0;j < (remainWordCount+1);j++){
+					testData[testRowCount][j] = remainPost[row][j];
+				}
+				testRowCount++;
+			}
+			for(int i = 0;i<trainPostRowArrayList.size();i++){
+				int row = trainPostRowArrayList.get(i);
+				for(int j = 0;j < (remainWordCount+1);j++){
+					trainData[i][j] = remainPost[row][j];
+				}
+			}
+			
+			System.out.println("countPost="+countPost+";testSize="+testSize+";trainSize"+trainSize);
+			
+			DecisionTree dt = new DecisionTree(trainSize, continuousList);
+			dt.trainDT(remainPost, dataAttributeIndex, continuousList);
+			
+			System.out.println("训练完成");
+			double sum = 0;
+			for(int  i = 0;i<testData.length;i++){
+				TreeNode rootNode = dt.getRootNode();
+				double theoryTheme = testPostToThemeMap.get(i);
+				double realTheme = dt.classifyByDT(testData[i], rootNode);
+				if(theoryTheme == realTheme){
+					sum ++;
+				}
+			}
+			sum = sum/ testData.length;
+			System.out.println("第k = "+k+" 次正确率为: "+sum);
+			
+		}
+		
+		
+		
+		
 		
 	}
 	
