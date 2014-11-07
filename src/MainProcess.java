@@ -162,20 +162,23 @@ public static void main(String[] args) throws IOException{
 		
 		int remainWordCount = wordMapIndex - deleteWord.size();		//这是删除掉一部分值
 		ArrayList<Integer> continuousList = new ArrayList<Integer>();
-		ArrayList<Integer> dataAttributeIndex = new ArrayList<Integer>();
+		
 		double[][] remainPost = new double[countPost][remainWordCount+1];
 		for(int i = 0;i<countPost;i++){
 			int k = 0;
 			for(int j = 0;j<wordMapIndex;j++){
 				if(tfList[j]>=10){
 					remainPost[i][k] = tfidfMatrix[i][j];
-					dataAttributeIndex.add(k);
 					k++;
 					continuousList.add(0);
 				}
 			}
 		}
 		
+		ArrayList<Integer> dataAttributeIndex = new ArrayList<Integer>();
+		for(int j = 0;j < remainWordCount;j++){
+			dataAttributeIndex.add(j);
+		}
 		
 		
 		for(int i = 0;i < countPost;i++){
@@ -218,9 +221,11 @@ public static void main(String[] args) throws IOException{
 				}
 			}
 			
-			System.out.println("countPost="+countPost+";testSize="+testSize+";trainSize"+trainSize);
+			System.out.println("countPost="+countPost+";testSize="+testSize+";trainSize"+
+					trainSize+"list size="+dataAttributeIndex.size());
 			
 			DecisionTree dt = new DecisionTree(trainSize, continuousList);
+			
 			dt.trainDT(remainPost, dataAttributeIndex, continuousList);
 			
 			System.out.println("训练完成");

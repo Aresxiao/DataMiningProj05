@@ -36,6 +36,7 @@ public class InfoGain {
 	public double giniIndex(int i){
 		double gini = 0;
 		if(continuousArrayList.get(i)==0){			//对于连续属性，连续属性对属性的值空间排序，然后找出最小GINI值的分裂点
+			
 			double[] tempAttriValue = new double[data.length];
 			for(int x = 0;x<tempAttriValue.length;x++){
 				tempAttriValue[x] = data[x][i];
@@ -52,7 +53,7 @@ public class InfoGain {
 					tempAttriValue[x] = t;
 				}
 			}
-			
+			System.out.println("continuous");
 			double minGini=1.0;
 			double splitVal=0;
 			for(int x = 0;x<(tempAttriValue.length-1);x++){
@@ -79,6 +80,7 @@ public class InfoGain {
 					splitVal = mid;
 				}
 			}
+			System.out.println("get the gini and splitVal");
 			gini = minGini;
 			splitValMap.put(i, splitVal);
 		}
