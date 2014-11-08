@@ -32,11 +32,112 @@ public class InfoGain {
 		splitValMap = new HashMap<Integer, Double>();
 	}
 	
+	public double calMinVariance(int i){
+		double variance = 0;
+		if(continuousArrayList.get(i)==0){
+			ArrayList<Double> tempAttributeValueList = new ArrayList<Double>();
+			for(int x = 0;x < data.length;x++){
+				if(!tempAttributeValueList.contains(data[x][i])){
+					tempAttributeValueList.add(data[x][i]);
+				}
+			}
+			double[] tempAttriValue = new double[tempAttributeValueList.size()];
+			for(int x = 0;x < tempAttributeValueList.size();x++){
+				tempAttriValue[x] = tempAttributeValueList.get(x);
+			}
+			for(int x = 0;x < tempAttriValue.length;x++){
+				int min = x;
+				for(int j = x;j < tempAttriValue.length;j++){
+					if(tempAttriValue[min] > tempAttriValue[j]){
+						min = j;
+					}
+				}
+				if(min != x){
+					double t = tempAttriValue[min];
+					tempAttriValue[min] = tempAttriValue[x];
+					tempAttriValue[x] = t;
+				}
+			}
+			double minVariance = 100000;
+			double splitVal = 0;
+			for(int x = 0;x < (tempAttriValue.length - 1);x++){
+				double mid = (tempAttriValue[x]+tempAttriValue[x+1])/2.0;
+				ArrayList<Double> lessSet = new ArrayList<Double>();
+				ArrayList<Double> biggerSet = new ArrayList<Double>();
+				
+				for(int y = 0;y<data.length;y++){
+					int lastIndex = data[0].length-1;
+					double val = data[y][lastIndex];
+					if(data[y][i]<mid){
+						lessSet.add(val);
+					}
+					else{
+						biggerSet.add(val);
+					}
+				}
+				double biggerSetSize = biggerSet.size();
+				double lessSetSize = lessSet.size();
+				
+				double v = (biggerSetSize/(biggerSetSize+lessSetSize))*getVariance(biggerSet)+
+						(lessSetSize/(lessSetSize+biggerSetSize))*getVariance(lessSet);
+				if(minVariance>v){
+					minVariance = v;
+					splitVal = mid;
+				}
+			}
+			variance = minVariance;
+			splitValMap.put(i, splitVal);
+		}
+		else {
+			
+			HashSet<Double> tempAttriValue = new HashSet<Double>();
+			for(int x = 0;x<data.length;x++){
+				tempAttriValue.add(data[x][i]);
+			}
+			Iterator<Double> iterator = tempAttriValue.iterator();
+			double minVariance = 100000;
+			double splitVal=0;
+			while(iterator.hasNext()){
+				double attriVal = iterator.next();
+				
+				ArrayList<Double> isThisAttributeValArrayList = new ArrayList<Double>();
+				ArrayList<Double> notThisAttributeValArrayList = new ArrayList<Double>();
+				
+				int lastIndex = data[0].length - 1;
+				for(int x = 0;x<data.length;x++){
+					double theme = data[x][lastIndex];
+					
+					if(data[x][i]==attriVal){
+						isThisAttributeValArrayList.add(theme);
+					}
+					else {
+						notThisAttributeValArrayList.add(theme);
+					}
+				}
+				
+				double isSize = isThisAttributeValArrayList.size();
+				double notSize = notThisAttributeValArrayList.size();
+				//
+				double giniGain = (isSize/(isSize+notSize))*getVariance(isThisAttributeValArrayList)+
+						(notSize/(isSize+notSize))*getVariance(notThisAttributeValArrayList);
+				
+				if(minVariance > giniGain){
+					minVariance = giniGain;
+					splitVal = attriVal;
+				}
+				
+			}
+			variance = minVariance;
+			splitValMap.put(i, splitVal);
+		}
+		
+		return variance;
+	}
 	
 	public double giniIndex(int i){
 		double gini = 0;
 		if(continuousArrayList.get(i)==0){			//对于连续属性，连续属性对属性的值空间排序，然后找出最小GINI值的分裂点
-			ArrayList<Double> tempAttributeValueList = new ArrayList<>();
+			ArrayList<Double> tempAttributeValueList = new ArrayList<Double>();
 			
 			for(int x = 0;x<data.length;x++){
 				if(!tempAttributeValueList.contains(data[x][i])){
@@ -120,7 +221,7 @@ public class InfoGain {
 				
 				double isSize = isThisAttributeValHashMap.size();
 				double notSize = notThisAttributeValHashMap.size();
-				
+				//
 				double giniGain = (isSize/(isSize+notSize))*getGini(isThisAttributeValHashMap)+
 						(notSize/(isSize+notSize))*getGini(notThisAttributeValHashMap);
 				
@@ -163,6 +264,22 @@ public class InfoGain {
 		sum = 1-sum;
 		
 		return sum;
+	}
+	
+	public double getVariance(ArrayList<Double> list){
+		double sum = 0;
+		for(int i = 0;i < list.size();i++){
+			sum += list.get(i);
+		}
+		double average = sum/list.size();
+		double variance = 0;
+		for(int i = 0;i < list.size();i++){
+			double d = list.get(i);
+			variance += (d-average)*(d-average);
+		}
+		variance = variance/list.size();
+		
+		return variance;
 	}
 	
 	public double getSplit(int i){
@@ -213,6 +330,8 @@ public class InfoGain {
 			}
 		}
 	}
+	
+	
 	
 	public double[][] getRightData(){
 		
@@ -265,8 +384,16 @@ public class InfoGain {
 				classId = key;
 			}
 		}
-		
 		return classId;
+	}
+	
+	public static double setDataSetMeanValue(ArrayList<Double> list){
+		double sum = 0;
+		for(int i = 0;i < list.size();i++){
+			sum += list.get(i);
+		}
+		double average = sum/list.size();
+		return average;
 	}
 }
 

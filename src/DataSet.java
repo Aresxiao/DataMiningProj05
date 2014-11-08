@@ -20,11 +20,13 @@ public class DataSet {
 	int dimensionNum;
 	ArrayList<Integer> continuousArrayList;
 	ArrayList<Integer> dataAttributeList;
+	int flag;		//0用来做分类，1用来做回归。
 	
-	public DataSet(){
+	public DataSet(int flag){
 		totalSampleNum = 0;
 		continuousArrayList = new ArrayList<>();
 		dataAttributeList = new ArrayList<>();
+		this.flag = flag;
 	}
 	
 	public void readPost() throws IOException{
@@ -211,6 +213,96 @@ public class DataSet {
 		
 	}
 	
+	public void readBreastCancerData() throws IOException{
+		String cancerDataString = "data\\breast-cancer.data";
+		File file = new File(cancerDataString);
+		Scanner scanner = new Scanner(file);
+		ArrayList<String> cancerDataArrayList = new ArrayList<String>();
+		while(scanner.hasNext()){
+			String string = scanner.nextLine();
+			cancerDataArrayList.add(string);
+		}
+		String string = cancerDataArrayList.get(0);
+		String[] attributeStrings = string.split(",");
+		for(int i = 0;i < attributeStrings.length;i++){
+			int val = Integer.parseInt(attributeStrings[i]);
+			continuousArrayList.add(val);
+			dataAttributeList.add(i);
+		}
+		dataAttributeList.remove(attributeStrings.length-1);
+		totalSampleNum = cancerDataArrayList.size()-1;
+		dimensionNum = attributeStrings.length;
+		
+		dataMatrix = new double[totalSampleNum][dimensionNum];
+		for(int i = 0;i<totalSampleNum;i++){
+			string = cancerDataArrayList.get(i+1);
+			attributeStrings = string.split(",");
+			for(int j = 0;j < dimensionNum;j++){
+				dataMatrix[i][j] = Double.parseDouble(attributeStrings[j]);
+			}
+		}
+	}
+	
+	public void readHousingData()throws IOException{
+		String housingDataString = "data\\housing.data";
+		File file = new File(housingDataString);
+		Scanner scanner = new Scanner(file);
+		ArrayList<String> cancerDataArrayList = new ArrayList<String>();
+		while(scanner.hasNext()){
+			String string = scanner.nextLine();
+			cancerDataArrayList.add(string);
+		}
+		String string = cancerDataArrayList.get(0);
+		String[] attributeStrings = string.split(",");
+		for(int i = 0;i < attributeStrings.length;i++){
+			int val = Integer.parseInt(attributeStrings[i]);
+			continuousArrayList.add(val);
+			dataAttributeList.add(i);
+		}
+		dataAttributeList.remove(attributeStrings.length-1);
+		totalSampleNum = cancerDataArrayList.size()-1;
+		dimensionNum = attributeStrings.length;
+		
+		dataMatrix = new double[totalSampleNum][dimensionNum];
+		for(int i = 0;i<totalSampleNum;i++){
+			string = cancerDataArrayList.get(i+1);
+			attributeStrings = string.split(",");
+			for(int j = 0;j < dimensionNum;j++){
+				dataMatrix[i][j] = Double.parseDouble(attributeStrings[j]);
+			}
+		}
+	}
+	
+	public void readMetaData() throws IOException{
+		String housingDataString = "data\\meta.data";
+		File file = new File(housingDataString);
+		Scanner scanner = new Scanner(file);
+		ArrayList<String> cancerDataArrayList = new ArrayList<String>();
+		while(scanner.hasNext()){
+			String string = scanner.nextLine();
+			cancerDataArrayList.add(string);
+		}
+		String string = cancerDataArrayList.get(0);
+		String[] attributeStrings = string.split(",");
+		for(int i = 0;i < attributeStrings.length;i++){
+			int val = Integer.parseInt(attributeStrings[i]);
+			continuousArrayList.add(val);
+			dataAttributeList.add(i);
+		}
+		dataAttributeList.remove(attributeStrings.length-1);
+		totalSampleNum = cancerDataArrayList.size()-1;
+		dimensionNum = attributeStrings.length;
+		
+		dataMatrix = new double[totalSampleNum][dimensionNum];
+		for(int i = 0;i<totalSampleNum;i++){
+			string = cancerDataArrayList.get(i+1);
+			attributeStrings = string.split(",");
+			for(int j = 0;j < dimensionNum;j++){
+				dataMatrix[i][j] = Double.parseDouble(attributeStrings[j]);
+			}
+		}
+	}
+	
 	public double[][] getDataMatrix(){
 		return dataMatrix;
 	}
@@ -230,4 +322,13 @@ public class DataSet {
 	public int getDimensionNum(){
 		return dimensionNum;
 	}
+	
+	public int getFlag() {
+		return flag;
+	}
+	
+	
 }
+
+
+

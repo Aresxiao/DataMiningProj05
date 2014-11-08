@@ -1,23 +1,12 @@
-import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-
-import org.wltea.analyzer.core.IKSegmenter;
-import org.wltea.analyzer.core.Lexeme;
 
 
 public class MainProcess {
 public static void main(String[] args) throws IOException{
 		
-		DataSet dataSet = new DataSet();
-		dataSet.readSegmentData();
+		DataSet dataSet = new DataSet(0);
+		dataSet.readPost();
 		
 		double[][] dataMatrix = dataSet.getDataMatrix();
 		int totalPostNum = dataSet.getTotalSampleNum();
@@ -25,6 +14,7 @@ public static void main(String[] args) throws IOException{
 		ArrayList<Integer> continuousList = dataSet.getContinuousArrayList();
 		ArrayList<Integer> dataAttributeIndex = dataSet.getAttributeList();
 		ArrayList<Double> accuracyArrayList = new ArrayList<Double>();		//用来存储准确率
+		System.out.println("开始交叉验证");
 		for(int k = 0; k < 10;k++){
 			ArrayList<Integer> testPostRowArrayList = new ArrayList<Integer>();
 			ArrayList<Integer> trainPostRowArrayList = new ArrayList<Integer>();
@@ -40,8 +30,7 @@ public static void main(String[] args) throws IOException{
 			
 			int testSize = testPostRowArrayList.size();
 			int trainSize = trainPostRowArrayList.size();
-			System.out.println("testSize="+testSize+",trainSize="+trainSize+",totalSampleNum="+totalPostNum+",dimensionNum="+dimensionNum);
-			System.out.println("continuous.size="+continuousList.size()+"attributeIndex.size="+dataAttributeIndex.size());
+			
 			double[][] testData = new double[testSize][dimensionNum];
 			double[][] trainData = new double[trainSize][dimensionNum];
 			
@@ -58,24 +47,35 @@ public static void main(String[] args) throws IOException{
 				}
 			}
 			
-			DecisionTree dt = new DecisionTree(totalPostNum, continuousList);
-			//System.out.println("开始训练");
+			DecisionTree dt = new DecisionTree(totalPostNum, continuousList,dataSet.getFlag());
 			dt.trainDT(trainData, dataAttributeIndex, continuousList);
-			
-			double sum = 0;
-			
-			for(int i = 0;i < testSize;i++){
-				double theoryTheme = testData[i][dimensionNum-1];
+			if(dataSet.getFlag()==0){
+				double sum = 0;
+				for(int i = 0;i < testSize;i++){
+					double theoryTheme = testData[i][dimensionNum-1];
+					TreeNode treeNode = dt.getRootNode();
+					double realTheme = dt.classifyByDT(testData[i], treeNode);
+					if(theoryTheme == realTheme)
+						sum++;
+				}
 				
-				TreeNode treeNode = dt.getRootNode();
-				double realTheme = dt.classifyByDT(testData[i], treeNode);
-				if(theoryTheme == realTheme)
-					sum++;
+				sum = sum/testSize;
+				accuracyArrayList.add(sum);
+				System.out.println("第k = "+k+" 次正确率为: "+sum);
 			}
-			
-			sum = sum/testSize;
-			accuracyArrayList.add(sum);
-			System.out.println("第k = "+k+" 次正确率为: "+sum);
+			else {
+				double sum = 0;
+				for(int i = 0;i < testSize;i++){
+					double theoryValue = testData[i][dimensionNum-1];
+					TreeNode treeNode = dt.getRootNode();
+					double realValue = dt.regressionByDT(testData[i], treeNode);
+					sum += (theoryValue - realValue)*(theoryValue - realValue);
+				}
+				sum = sum/testSize;
+				sum = Math.sqrt(sum);
+				accuracyArrayList.add(sum);
+				System.out.println("第k = "+k+" 次MSE为: "+sum);
+			}
 		}
 		
 		double correctSum = 0;
