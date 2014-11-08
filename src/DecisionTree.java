@@ -17,39 +17,10 @@ public class DecisionTree {
 	
 	public TreeNode createDT(double[][] trainData,ArrayList<Integer> dataAttributeList,ArrayList<Integer> continuous){
 		TreeNode node= new TreeNode();
-		System.out.println("create decision tree,trainData.length="+trainData.length);
+		//System.out.println("create decision tree,trainData.length="+trainData.length);
 		
-		if(trainData.length < 30){
-			/*
-			if(trainData.length<=0){
-				node.setNodeId(0);
-				node.setTartgetValue(-1);
-				return node;
-			}
-			HashMap<Double, Double> themeNumMap = new HashMap<Double,Double>();
-			int lastIndex = trainData[0].length-1;
-			for(int i = 0;i < trainData.length;i++){
-				if(themeNumMap.containsKey(trainData[i][lastIndex])){
-					double d = themeNumMap.get(trainData[i][lastIndex]);
-					themeNumMap.put(trainData[i][lastIndex], d+1);
-				}
-				else {
-					themeNumMap.put(trainData[i][lastIndex], 1.0);
-				}
-			}
-			double maxKey = 0;
-			double maxVal = -10;
-			Iterator<Double> iterator = themeNumMap.keySet().iterator();
-			while(iterator.hasNext()){
-				double key = iterator.next();
-				double val = themeNumMap.get(key);
-				
-				if(val>maxVal){
-					maxVal = val;
-					maxKey = key;
-				}
-				
-			}*/
+		if(trainData.length < 40){
+			
 			double maxKey = InfoGain.setDataSetClass(InfoGain.getTarget(trainData));
 			node.setNodeName("leafNode");
 			node.setNodeId(0);
@@ -58,36 +29,14 @@ public class DecisionTree {
 		}
 		double pureVal = InfoGain.isPure(InfoGain.getTarget(trainData));
 		if(pureVal!=-1){
-			System.out.println("pureVal!=-1,get a leafNode");
+			//System.out.println("pureVal!=-1,get a leafNode");
 			node.setNodeName("leafNode");
 			node.setNodeId(0);
 			node.setTartgetValue(pureVal);
 			return node;
 		}
 		if(dataAttributeList.size()==0){
-			/*
-			HashMap<Double, Double> themeNumMap = new HashMap<Double, Double>();
-			int lastIndex = trainData[0].length - 1;
-			for(int i = 0;i < trainData.length; i++){
-				if(themeNumMap.containsKey(trainData[i][lastIndex])){
-					double d = themeNumMap.get(trainData[i][lastIndex]);
-					themeNumMap.put(trainData[i][lastIndex], d+1.0);
-				}
-				else {
-					themeNumMap.put(trainData[i][lastIndex], 1.0);
-				}
-			}
-			double maxKey = 0;
-			double maxVal = -10;
-			Iterator<Double> iterator = themeNumMap.keySet().iterator();
-			while(iterator.hasNext()){
-				double key = iterator.next();
-				double val = themeNumMap.get(key);
-				if(val>maxVal){
-					maxVal = val;
-					maxKey = key;
-				}
-			}*/
+			
 			double maxKey = InfoGain.setDataSetClass(InfoGain.getTarget(trainData));
 			node.setNodeName("leafNode");
 			node.setNodeId(0);
@@ -95,7 +44,7 @@ public class DecisionTree {
 			return node;
 		}
 		else{
-			System.out.println("attributelis size is not empty");
+			//System.out.println("attributelis size is not empty");
 			double minGain = 10.0;
 			int attrIndex = -1;
 			InfoGain infoGain = new InfoGain(trainData,dataAttributeList,continuous);
@@ -108,31 +57,7 @@ public class DecisionTree {
 				}
 			}
 			if(attrIndex==-1){
-				/*
-				HashMap<Double, Double> themeNumMap = new HashMap<Double,Double>();
-				int lastIndex = trainData[0].length-1;
-				for(int i = 0;i < trainData.length;i++){
-					if(themeNumMap.containsKey(trainData[i][lastIndex])){
-						double d = themeNumMap.get(trainData[i][lastIndex]);
-						themeNumMap.put(trainData[i][lastIndex], d+1);
-					}
-					else {
-						themeNumMap.put(trainData[i][lastIndex], 1.0);
-					}
-				}
-				double maxKey = 0;
-				double maxVal = -10;
-				Iterator<Double> iterator = themeNumMap.keySet().iterator();
-				while(iterator.hasNext()){
-					double key = iterator.next();
-					double val = themeNumMap.get(key);
-					
-					if(val>maxVal){
-						maxVal = val;
-						maxKey = key;
-					}
-					
-				}*/
+				
 				double maxKey = InfoGain.setDataSetClass(InfoGain.getTarget(trainData));
 				node.setNodeName("leafNode");
 				node.setNodeId(0);

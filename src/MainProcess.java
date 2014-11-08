@@ -24,7 +24,7 @@ public static void main(String[] args) throws IOException{
 		int dimensionNum = dataSet.getDimensionNum();
 		ArrayList<Integer> continuousList = dataSet.getContinuousArrayList();
 		ArrayList<Integer> dataAttributeIndex = dataSet.getAttributeList();
-		
+		ArrayList<Double> accuracyArrayList = new ArrayList<Double>();		//用来存储准确率
 		for(int k = 0; k < 10;k++){
 			ArrayList<Integer> testPostRowArrayList = new ArrayList<Integer>();
 			ArrayList<Integer> trainPostRowArrayList = new ArrayList<Integer>();
@@ -40,7 +40,7 @@ public static void main(String[] args) throws IOException{
 			
 			int testSize = testPostRowArrayList.size();
 			int trainSize = trainPostRowArrayList.size();
-			System.out.println("testSize="+testSize+",trainSize="+trainSize+",totalSampleNum="+totalPostNum+",dimensionNum"+dimensionNum);
+			System.out.println("testSize="+testSize+",trainSize="+trainSize+",totalSampleNum="+totalPostNum+",dimensionNum="+dimensionNum);
 			System.out.println("continuous.size="+continuousList.size()+"attributeIndex.size="+dataAttributeIndex.size());
 			double[][] testData = new double[testSize][dimensionNum];
 			double[][] trainData = new double[trainSize][dimensionNum];
@@ -59,7 +59,7 @@ public static void main(String[] args) throws IOException{
 			}
 			
 			DecisionTree dt = new DecisionTree(totalPostNum, continuousList);
-			System.out.println("开始训练");
+			//System.out.println("开始训练");
 			dt.trainDT(trainData, dataAttributeIndex, continuousList);
 			
 			double sum = 0;
@@ -74,10 +74,23 @@ public static void main(String[] args) throws IOException{
 			}
 			
 			sum = sum/testSize;
+			accuracyArrayList.add(sum);
 			System.out.println("第k = "+k+" 次正确率为: "+sum);
 		}
 		
-		
+		double correctSum = 0;
+		double averageRatio = 0;
+		double variance = 0;
+		for(int i = 0;i < accuracyArrayList.size();i++){
+			correctSum += accuracyArrayList.get(i);
+		}
+		averageRatio = correctSum/accuracyArrayList.size();
+		for(int i = 0;i < accuracyArrayList.size();i++){
+			double d = accuracyArrayList.get(i);
+			variance+=(d-averageRatio)*(d-averageRatio);
+		}
+		variance = variance/accuracyArrayList.size();
+		System.out.println("平均准确率为: "+averageRatio+",方差为："+variance);
 	}
 	
 	
