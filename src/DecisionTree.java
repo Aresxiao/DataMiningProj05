@@ -17,16 +17,15 @@ public class DecisionTree {
 	
 	public TreeNode createDT(double[][] trainData,ArrayList<Integer> dataAttributeList,ArrayList<Integer> continuous){
 		TreeNode node= new TreeNode();
-		System.out.println("create decision tree");
-		double pureVal = InfoGain.isPure(InfoGain.getTarget(trainData));
+		System.out.println("create decision tree,trainData.length="+trainData.length);
 		
-		if(pureVal!=-1){
-			node.setNodeName("leafNode");
-			node.setNodeId(0);
-			node.setTartgetValue(pureVal);
-			return node;
-		}
-		if(trainData.length < 6){
+		if(trainData.length < 30){
+			/*
+			if(trainData.length<=0){
+				node.setNodeId(0);
+				node.setTartgetValue(-1);
+				return node;
+			}
 			HashMap<Double, Double> themeNumMap = new HashMap<Double,Double>();
 			int lastIndex = trainData[0].length-1;
 			for(int i = 0;i < trainData.length;i++){
@@ -50,14 +49,23 @@ public class DecisionTree {
 					maxKey = key;
 				}
 				
-			}
+			}*/
+			double maxKey = InfoGain.setDataSetClass(InfoGain.getTarget(trainData));
 			node.setNodeName("leafNode");
 			node.setNodeId(0);
 			node.setTartgetValue(maxKey);
 			return node;
 		}
-		
+		double pureVal = InfoGain.isPure(InfoGain.getTarget(trainData));
+		if(pureVal!=-1){
+			System.out.println("pureVal!=-1,get a leafNode");
+			node.setNodeName("leafNode");
+			node.setNodeId(0);
+			node.setTartgetValue(pureVal);
+			return node;
+		}
 		if(dataAttributeList.size()==0){
+			/*
 			HashMap<Double, Double> themeNumMap = new HashMap<Double, Double>();
 			int lastIndex = trainData[0].length - 1;
 			for(int i = 0;i < trainData.length; i++){
@@ -79,7 +87,8 @@ public class DecisionTree {
 					maxVal = val;
 					maxKey = key;
 				}
-			}
+			}*/
+			double maxKey = InfoGain.setDataSetClass(InfoGain.getTarget(trainData));
 			node.setNodeName("leafNode");
 			node.setNodeId(0);
 			node.setTartgetValue(maxKey);
@@ -87,17 +96,49 @@ public class DecisionTree {
 		}
 		else{
 			System.out.println("attributelis size is not empty");
-			double minGain = 1.0;
+			double minGain = 10.0;
 			int attrIndex = -1;
 			InfoGain infoGain = new InfoGain(trainData,dataAttributeList,continuous);
 			for(int i = 0;i < dataAttributeList.size();i++){
 				double tempGain = infoGain.giniIndex(dataAttributeList.get(i));
+				
 				if(minGain > tempGain){
 					minGain = tempGain;
-					attrIndex = dataAttributeList.get(i);
+					attrIndex = i;
 				}
 			}
-			System.out.println("after select attribute");
+			if(attrIndex==-1){
+				/*
+				HashMap<Double, Double> themeNumMap = new HashMap<Double,Double>();
+				int lastIndex = trainData[0].length-1;
+				for(int i = 0;i < trainData.length;i++){
+					if(themeNumMap.containsKey(trainData[i][lastIndex])){
+						double d = themeNumMap.get(trainData[i][lastIndex]);
+						themeNumMap.put(trainData[i][lastIndex], d+1);
+					}
+					else {
+						themeNumMap.put(trainData[i][lastIndex], 1.0);
+					}
+				}
+				double maxKey = 0;
+				double maxVal = -10;
+				Iterator<Double> iterator = themeNumMap.keySet().iterator();
+				while(iterator.hasNext()){
+					double key = iterator.next();
+					double val = themeNumMap.get(key);
+					
+					if(val>maxVal){
+						maxVal = val;
+						maxKey = key;
+					}
+					
+				}*/
+				double maxKey = InfoGain.setDataSetClass(InfoGain.getTarget(trainData));
+				node.setNodeName("leafNode");
+				node.setNodeId(0);
+				node.setTartgetValue(maxKey);
+				return node;
+			}
 			node.setAttributeValue(dataAttributeList.get(attrIndex));
 			node.setSplitVal(infoGain.getSplit(dataAttributeList.get(attrIndex)));
 			node.setContinuous(continuous.get(dataAttributeList.get(attrIndex)));
@@ -106,11 +147,17 @@ public class DecisionTree {
 			double[][] leftData = infoGain.getLeftData();
 			double[][] rightData = infoGain.getRightData();
 			
-			ArrayList<Integer> leftAttributeList = (ArrayList<Integer>) dataAttributeList.clone();
-			ArrayList<Integer> rightAttributeList = (ArrayList<Integer>) dataAttributeList.clone();
-			leftAttributeList.remove(attrIndex);
-			rightAttributeList.remove(attrIndex);
-			System.out.println("before recursion");
+			ArrayList<Integer> leftAttributeList = new ArrayList<>();
+			
+			ArrayList<Integer> rightAttributeList = new ArrayList<>();
+			for(int i = 0;i < dataAttributeList.size();i++){
+				if(i != attrIndex){
+					leftAttributeList.add(dataAttributeList.get(i));
+					rightAttributeList.add(dataAttributeList.get(i));
+				}
+			}
+			
+			//System.out.println("before recursion");
 			TreeNode leftNode = createDT(leftData, leftAttributeList, continuous);
 			TreeNode rightNode = createDT(rightData, rightAttributeList, continuous);
 			node.getChildTreeNodes().add(leftNode);
@@ -121,7 +168,7 @@ public class DecisionTree {
 	}
 	
 	public void trainDT(double[][] trainData,ArrayList<Integer> dataAttributeList,ArrayList<Integer> continuous){
-		System.out.println("trainDT size = "+dataAttributeList.size());
+		//System.out.println("trainDT size = "+dataAttributeList.size());
 		rootNode = createDT(trainData, dataAttributeList, continuous);
 	}
 	

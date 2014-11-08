@@ -36,11 +36,19 @@ public class InfoGain {
 	public double giniIndex(int i){
 		double gini = 0;
 		if(continuousArrayList.get(i)==0){			//对于连续属性，连续属性对属性的值空间排序，然后找出最小GINI值的分裂点
+			ArrayList<Double> tempAttributeValueList = new ArrayList<>();
 			
-			double[] tempAttriValue = new double[data.length];
-			for(int x = 0;x<tempAttriValue.length;x++){
-				tempAttriValue[x] = data[x][i];
+			for(int x = 0;x<data.length;x++){
+				if(!tempAttributeValueList.contains(data[x][i])){
+					tempAttributeValueList.add(data[x][i]);
+				}
 			}
+			
+			double[] tempAttriValue = new double[tempAttributeValueList.size()];
+			for(int x = 0;x < tempAttributeValueList.size();x++){
+				tempAttriValue[x] = tempAttributeValueList.get(x);
+			}
+			
 			for(int x = 0;x<tempAttriValue.length;x++){
 				int min = x;
 				for(int j = x;j<tempAttriValue.length;j++){
@@ -53,8 +61,8 @@ public class InfoGain {
 					tempAttriValue[x] = t;
 				}
 			}
-			System.out.println("continuous");
-			double minGini=1.0;
+			
+			double minGini=10.0;
 			double splitVal=0;
 			for(int x = 0;x<(tempAttriValue.length-1);x++){
 				double mid = (tempAttriValue[x]+tempAttriValue[x+1])/2.0;
@@ -63,11 +71,11 @@ public class InfoGain {
 				for(int y = 0;y<data.length;y++){
 					int lastIndex = data[0].length-1;
 					double theme = data[y][lastIndex];
-					if(data[y][i]>mid){
-						biggerSet.put(y, theme);
+					if(data[y][i]<mid){
+						lessSet.put(y, theme);
 					}
 					else{
-						lessSet.put(y, theme);
+						biggerSet.put(y, theme);
 					}
 				}
 				double biggerSetSize = biggerSet.size();
@@ -80,7 +88,6 @@ public class InfoGain {
 					splitVal = mid;
 				}
 			}
-			System.out.println("get the gini and splitVal");
 			gini = minGini;
 			splitValMap.put(i, splitVal);
 		}
@@ -132,12 +139,12 @@ public class InfoGain {
 	
 	public double getGini(HashMap<Integer, Double> map){
 		double size = map.size();
-		HashMap<Integer, Double> themeNumMap = new HashMap<Integer, Double>();
+		HashMap<Double, Double> themeNumMap = new HashMap<Double, Double>();
 		Iterator iterator = map.entrySet().iterator();
 		while(iterator.hasNext()){
 			Map.Entry<Integer, Double> entry = (Entry<Integer, Double>) iterator.next();
 			
-			int val = entry.getKey();
+			double val = entry.getValue();
 			if(themeNumMap.containsKey(val)){
 				double d = themeNumMap.get(val);
 				themeNumMap.put(val, d+1.0);
@@ -234,4 +241,35 @@ public class InfoGain {
 		}
 		return list;
 	}
+	public static double setDataSetClass(ArrayList<Double> list){
+		HashMap<Double, Double> map = new HashMap<Double, Double>();
+		
+		for(int i = 0;i < list.size();i++){
+			if(map.containsKey(list.get(i))){
+				double d = map.get(list.get(i));
+				map.put(list.get(i), d+1);
+			}
+			else {
+				map.put(list.get(i), 1.0);
+			}
+		}
+		
+		Iterator<Double> iterator = map.keySet().iterator();
+		double classId = 0;
+		double maxClass=-1;
+		while (iterator.hasNext()) {
+			double key = iterator.next();
+			double val = map.get(key);
+			if(maxClass < val){
+				maxClass = val;
+				classId = key;
+			}
+		}
+		
+		return classId;
+	}
 }
+
+
+
+
