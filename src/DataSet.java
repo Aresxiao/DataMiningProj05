@@ -52,7 +52,7 @@ public class DataSet {
 		Map<String,Double> idfMap = new HashMap<String, Double>();
 		
 		int wordMapIndex=0;
-		String str;
+		String str="";
 		for(int i = 0;i < post.length;i++){
 			File file = new File(post[i]);
 			Scanner input = new Scanner(file);
@@ -91,7 +91,7 @@ public class DataSet {
 			Lexeme lx = null;
 			while((lx = ik.next())!=null){
 				String word = lx.getLexemeText();
-				int column = wordMap.get(word).intValue();
+				int column = wordMap.get(word);
 				tfidfMatrix[i][column] = tfidfMatrix[i][column]+1;
 			}
 		}
@@ -107,7 +107,7 @@ public class DataSet {
 		
 		ArrayList<Integer> deleteWord = new ArrayList<Integer>();
 		for(int j = 0;j<wordMapIndex;j++){
-			if(tfList[j]<10)
+			if(tfList[j]<15)
 				deleteWord.add(j);
 		}
 		
@@ -161,8 +161,9 @@ public class DataSet {
 		for(int i = 0;i<totalSampleNum;i++){
 			int k = 0;
 			for(int j = 0;j<wordMapIndex;j++){
-				if(tfList[j]>=10){
+				if(tfList[j]>=15){
 					dataMatrix[i][k] = tfidfMatrix[i][j];
+					k++;
 				}
 			}
 		}
@@ -171,7 +172,7 @@ public class DataSet {
 			continuousArrayList.add(0);
 			dataAttributeList.add(j);
 		}
-		
+		continuousArrayList.add(1);
 		for(int i = 0;i < totalSampleNum;i++){
 			int theme = postToThemeMap.get(i);
 			dataMatrix[i][remainWordCount] = theme;

@@ -3,11 +3,22 @@ import java.util.ArrayList;
 
 
 public class MainProcess {
-public static void main(String[] args) throws IOException{
-		
+	
+	public static void main(String[] args) throws IOException{
+		/*
 		DataSet dataSet = new DataSet(0);
-		dataSet.readPost();
+		dataSet.readSegmentData();
+		System.out.println("读完数据");
+		DecisionTree dt = new DecisionTree(dataSet, 40);
+		dt.tenFoldCrossValidation();
+		*/
+		DataSet dataSet = new DataSet(0);
+		dataSet.readBreastCancerData();
+		System.out.println("读完数据");
+		StackingDecisionTree sdt = new StackingDecisionTree(dataSet);
+		sdt.tenFoldCrossValidation();
 		
+		/*
 		double[][] dataMatrix = dataSet.getDataMatrix();
 		int totalPostNum = dataSet.getTotalSampleNum();
 		int dimensionNum = dataSet.getDimensionNum();
@@ -47,7 +58,7 @@ public static void main(String[] args) throws IOException{
 				}
 			}
 			
-			DecisionTree dt = new DecisionTree(totalPostNum, continuousList,dataSet.getFlag());
+			DecisionTree dt = new DecisionTree(totalPostNum, continuousList,dataSet.getFlag(),40);
 			dt.trainDT(trainData, dataAttributeIndex, continuousList);
 			if(dataSet.getFlag()==0){
 				double sum = 0;
@@ -91,7 +102,7 @@ public static void main(String[] args) throws IOException{
 		}
 		variance = variance/accuracyArrayList.size();
 		System.out.println("平均准确率为: "+averageRatio+",方差为："+variance);
+		*/
 	}
-	
 	
 }
