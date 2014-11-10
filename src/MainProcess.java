@@ -16,12 +16,16 @@ public class MainProcess {
 		
 		
 		DataSet dataSet = new DataSet();
-		dataSet.readMetaData();
+		//dataSet.readMetaData();
+		//dataSet.readBreastCancerData();
+		//dataSet.readHousingData();
+		//dataSet.readSegmentData();
+		dataSet.readPost();
 		System.out.println("读完数据");
-		DecisionTree dt = new DecisionTree(dataSet, 40);
-		dt.tenFoldCrossValidation();
-		//StackingDecisionTree sdt = new StackingDecisionTree(dataSet);
-		//sdt.tenFoldCrossValidation();
+		//DecisionTree dt = new DecisionTree(dataSet, 40);
+		//dt.tenFoldCrossValidation();
+		StackingDecisionTree sdt = new StackingDecisionTree(dataSet);
+		sdt.tenFoldCrossValidation();
 		
 		/*
 		double[][] dataMatrix = dataSet.getDataMatrix();

@@ -13,7 +13,7 @@ public class StackingDecisionTree {
 	public StackingDecisionTree(DataSet dataSet){
 		
 		flag = dataSet.getFlag();
-		N = 5;
+		N = 3;
 		K = 10;
 		this.dataSet = dataSet;
 		dimensionNum = dataSet.getDimensionNum();
