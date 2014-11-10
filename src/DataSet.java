@@ -22,11 +22,11 @@ public class DataSet {
 	ArrayList<Integer> dataAttributeList;
 	int flag;		//0用来做分类，1用来做回归。
 	
-	public DataSet(int flag){
+	public DataSet(){
 		totalSampleNum = 0;
 		continuousArrayList = new ArrayList<>();
 		dataAttributeList = new ArrayList<>();
-		this.flag = flag;
+		
 	}
 	
 	public void readPost() throws IOException{
@@ -178,6 +178,8 @@ public class DataSet {
 			dataMatrix[i][remainWordCount] = theme;
 		}
 		dimensionNum = remainWordCount + 1;
+		
+		flag = 0;
 	}
 	
 	public void readSegmentData() throws IOException{
@@ -211,7 +213,7 @@ public class DataSet {
 				dataMatrix[i][j] = Double.parseDouble(attributeString[j]);
 			}
 		}
-		
+		flag = 0;
 	}
 	
 	public void readBreastCancerData() throws IOException{
@@ -242,6 +244,7 @@ public class DataSet {
 				dataMatrix[i][j] = Double.parseDouble(attributeStrings[j]);
 			}
 		}
+		flag = 0;
 	}
 	
 	public void readHousingData()throws IOException{
@@ -272,6 +275,7 @@ public class DataSet {
 				dataMatrix[i][j] = Double.parseDouble(attributeStrings[j]);
 			}
 		}
+		flag = 1;
 	}
 	
 	public void readMetaData() throws IOException{
@@ -302,6 +306,7 @@ public class DataSet {
 				dataMatrix[i][j] = Double.parseDouble(attributeStrings[j]);
 			}
 		}
+		flag = 1;
 	}
 	
 	public double[][] getDataMatrix(){

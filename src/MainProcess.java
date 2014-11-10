@@ -7,16 +7,21 @@ public class MainProcess {
 	public static void main(String[] args) throws IOException{
 		/*
 		DataSet dataSet = new DataSet(0);
-		dataSet.readSegmentData();
+		dataSet.readBreastCancerData();
+		System.out.println("读完数据");
+		
+		*/
+		
+		
+		
+		
+		DataSet dataSet = new DataSet();
+		dataSet.readMetaData();
 		System.out.println("读完数据");
 		DecisionTree dt = new DecisionTree(dataSet, 40);
 		dt.tenFoldCrossValidation();
-		*/
-		DataSet dataSet = new DataSet(0);
-		dataSet.readBreastCancerData();
-		System.out.println("读完数据");
-		StackingDecisionTree sdt = new StackingDecisionTree(dataSet);
-		sdt.tenFoldCrossValidation();
+		//StackingDecisionTree sdt = new StackingDecisionTree(dataSet);
+		//sdt.tenFoldCrossValidation();
 		
 		/*
 		double[][] dataMatrix = dataSet.getDataMatrix();
@@ -58,7 +63,7 @@ public class MainProcess {
 				}
 			}
 			
-			DecisionTree dt = new DecisionTree(totalPostNum, continuousList,dataSet.getFlag(),40);
+			DecisionTree dt = new DecisionTree(dataSet, 40);
 			dt.trainDT(trainData, dataAttributeIndex, continuousList);
 			if(dataSet.getFlag()==0){
 				double sum = 0;

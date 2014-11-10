@@ -11,10 +11,12 @@ public class DecisionTree {
 	int minimumNumLeaf;
 	DataSet dataSet;
 	
+	
 	public DecisionTree(int flag,int mimimumNumLeaf,ArrayList<Integer> continuous){
 		this.flag = flag;
 		this.minimumNumLeaf = mimimumNumLeaf;
 		attributeContinuous = (ArrayList<Integer>) continuous.clone();
+		
 	}
 	
 	public DecisionTree(DataSet ds,int minimumNumLeaf){
@@ -90,7 +92,20 @@ public class DecisionTree {
 						rightAttributeList.add(dataAttributeList.get(i));
 					}
 				}
-				
+				if(leftAttributeList.size()==0){
+					double maxKey = InfoGain.setDataSetClass(InfoGain.getTarget(trainData));
+					node.setTartgetValue(maxKey);
+					node.setNodeName("leafName");
+					node.setNodeId(0);
+					return node;
+				}
+				if(leftData.length == 0||rightData.length == 0){
+					double maxKey = InfoGain.setDataSetClass(InfoGain.getTarget(trainData));
+					node.setTartgetValue(maxKey);
+					node.setNodeId(0);
+					node.setNodeName("leafNode");
+					return node;
+				}
 				//System.out.println("before recursion");
 				TreeNode leftNode = createDT(leftData, leftAttributeList, continuous);
 				TreeNode rightNode = createDT(rightData, rightAttributeList, continuous);
@@ -312,7 +327,11 @@ public class DecisionTree {
 			variance+=(d-averageRatio)*(d-averageRatio);
 		}
 		variance = variance/accuracyArrayList.size();
-		System.out.println("平均准确率为: "+averageRatio+",方差为："+variance);
-		
+		if(flag == 0){
+			System.out.println("平均准确率为: "+averageRatio+",方差为："+variance);
+		}
+		else {
+			System.out.println("平均MSE为: "+averageRatio+",方差为："+variance);
+		}
 	}
 }

@@ -28,7 +28,7 @@ public class InfoGain {
 		}
 		this.attributeList = (ArrayList<Integer>) attributeList.clone();
 		
-		this.continuousArrayList = (ArrayList<Integer>) continuous.clone();
+		this.continuousArrayList = (ArrayList<Integer>) continuous.clone(); 
 		splitValMap = new HashMap<Integer, Double>();
 	}
 	
@@ -199,7 +199,7 @@ public class InfoGain {
 				tempAttriValue.add(data[x][i]);
 			}
 			Iterator<Double> iterator = tempAttriValue.iterator();
-			double miniGini = 1.0;
+			double miniGini = 10.0;
 			double splitVal=0;
 			while(iterator.hasNext()){
 				double attriVal = iterator.next();
