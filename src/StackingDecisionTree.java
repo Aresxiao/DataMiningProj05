@@ -19,8 +19,8 @@ public class StackingDecisionTree {
 		dimensionNum = dataSet.getDimensionNum();
 		decisionTrees = new ArrayList<DecisionTree>();
 		for(int i = 0;i < N;i++){
-			int leafNum = i+40;
-			DecisionTree dt = new DecisionTree(dataSet, leafNum);
+			int minimumLeaf = i+40;
+			DecisionTree dt = new DecisionTree(dataSet,minimumLeaf);
 			decisionTrees.add(dt);
 		}
 	}
@@ -74,14 +74,15 @@ public class StackingDecisionTree {
 				
 				for(int y = 0;y < diSize;y++){
 					TreeNode treeNode = dt.getRootNode();
-					double calTheme=0;
+					double calTheme = 0;
 					if(flag==0){
 						calTheme = dt.classifyByDT(diData[y], treeNode);
+						metaData[metaDataRowFlag+y][j] = calTheme;
 					}
 					else {
 						calTheme = dt.regressionByDT(diData[y], treeNode);
+						metaData[metaDataRowFlag+y][j] = calTheme;
 					}
-					metaData[metaDataRowFlag+y][j] = calTheme;
 					
 				}
 				diSizeFlag = diSize;
@@ -94,9 +95,12 @@ public class StackingDecisionTree {
 		
 		ArrayList<Integer> metaContinuousList = new ArrayList<Integer>();
 		ArrayList<Integer> metaDataAttributeIndexList = new ArrayList<Integer>();
+		
 		for(int i = 0;i < (N+1);i++){
 			metaContinuousList.add(1);
 		}
+		
+		
 		for(int i = 0;i< N;i++){
 			metaDataAttributeIndexList.add(i);
 		}
@@ -112,7 +116,7 @@ public class StackingDecisionTree {
 	
 	public double classifyByDT(double[] test){		//分类
 		double[] metaLevelFeature = new double[N+1];
-		metaLevelFeature[N] = 0;
+		metaLevelFeature[N] = test[dimensionNum-1];
 		for(int i = 0;i < N;i++){
 			DecisionTree dt = decisionTrees.get(i);
 			TreeNode treeNode = dt.getRootNode();
